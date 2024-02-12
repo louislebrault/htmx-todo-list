@@ -1,0 +1,13 @@
+{
+    "name": "louislebrault/htmx-tryout",
+    "authors": [
+        {
+            "name": "Louis Lebrault",
+            "email": "louis.lebrault@gmail.com"
+        }
+    ],
+    "require": {
+        "slim/slim": "4.*",
+        "slim/psr7": "^1.6"
+    }
+}
