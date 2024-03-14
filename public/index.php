@@ -26,7 +26,7 @@ EOT;
 
 function renderList(array $todoList): string
 {
-    $list = '<ul class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">';
+    $list = '<ul id="todos" class="max-w-md space-y-1 text-gray-500 list-none list-inside dark:text-gray-400">';
 
     for ($i = 0; $i < count($todoList); $i++) {
         $list .= renderItem($i);
@@ -42,7 +42,7 @@ function renderButtons(): string
     return <<<EOT
 <div id="bottom" class="my-2 text-center">
   <button hx-get="/form" hx-target="#bottom" class="bg-blue-700 hover:bg-blue-900 px-5 py-2 mx-1 text-sm leading-5 rounded-full font-semibold text-white my-3">Add todo</button>
-  <button hx-post="/clear" hx-target="#todo-list" class="bg-gray-600 hover:bg-gray-800 px-5 py-2 mx-1 text-sm leading-5 rounded-full font-semibold text-white my-3">Clear</button>
+  <button hx-post="/clear" hx-target="#todos" class="bg-gray-600 hover:bg-gray-800 px-5 py-2 mx-1 text-sm leading-5 rounded-full font-semibold text-white my-3">Clear</button>
 </div>
 EOT;
 }
@@ -52,7 +52,7 @@ function renderForm(): string
     global $checkSvg, $xMarkSvg;
 
     return <<<EOT
-<form hx-post="/new" hx-target="#todo-list" hx-swap="outerHTML" class="py-5 flex items-center justify-center">
+<form hx-post="/new" hx-target="#main" hx-swap="outerHTML" class="py-5 flex items-center justify-center">
     <input type="text" name="name" autocomplete="off" autofocus class="mr-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"/>
     <button class="w-7 h-7">{$checkSvg}</button>
     <button hx-post="/new/cancel" class="w-7 h-7">{$xMarkSvg}</button>
@@ -74,7 +74,7 @@ $app->get('/', function (Request $request, Response $response, $args) {
   </head>
   <body class="p-5 bg-white dark:bg-gray-900 antialiased max-w-2xl m-auto">
     <h1 class="mb-4 text-center text-5xl font-extrabold leading-none tracking-tight text-gray-900 dark:text-gray-300">HTMX Todo List</h1>
-    <div id="todo-list">
+    <div id="main">
       {$list}
       {$buttons}
     </div>
@@ -99,7 +99,7 @@ $app->post('/new', function (Request $request, Response $response, $args) {
         $list = renderList($_SESSION['todos']);
         $form = renderForm();
 
-        $response->getBody()->write('<div id="todo-list">' . $list . $form . '</div>');
+        $response->getBody()->write('<div id="main">' . $list . $form . '</div>');
 
         return $response;
     }
@@ -109,7 +109,7 @@ $app->post('/new', function (Request $request, Response $response, $args) {
     $list = renderList($_SESSION['todos']);
     $buttons = renderButtons();
 
-    $response->getBody()->write('<div id="todo-list">' . $list . $buttons . '</div>');
+    $response->getBody()->write('<div id="main">' . $list . $buttons . '</div>');
 
     return $response;
 });
@@ -118,7 +118,7 @@ $app->post('/new/cancel', function (Request $request, Response $response, $args)
     $list = renderList($_SESSION['todos']);
     $buttons = renderButtons();
 
-    $response->getBody()->write('<div id="todo-list">' . $list . $buttons . '</div>');
+    $response->getBody()->write('<div id="main">' . $list . $buttons . '</div>');
 
     return $response;
 });
@@ -142,9 +142,8 @@ $app->post('/clear', function (Request $request, Response $response, $args) {
     $_SESSION['doneTodos'] = [];
     $_SESSION['todos'] = [];
     $list = renderList($_SESSION['todos']);
-    $buttons = renderButtons();
 
-    $response->getBody()->write('<div id="todo-list">' . $list . $buttons . '</div>');
+    $response->getBody()->write($list);
 
     return $response;
 });
